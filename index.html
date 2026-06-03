@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PythonGroup - Cargando...</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap');
+
+  :root {
+    --pink: #ff4fa3;
+    --cyan: #00eeff;
+    --yellow: #ffe94f;
+    --purple: #b44fff;
+    --dark: #0a0a1a;
+    --darker: #050510;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Nunito', sans-serif;
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,238,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,238,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridMove 8s linear infinite;
+    z-index: 0;
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+  }
+
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: blobPulse 4s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+  .blob1 { width: 400px; height: 400px; background: var(--pink); top: -100px; left: -100px; animation-delay: 0s; }
+  .blob2 { width: 350px; height: 350px; background: var(--cyan); bottom: -80px; right: -80px; animation-delay: 1.5s; }
+  .blob3 { width: 300px; height: 300px; background: var(--purple); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 0.8s; }
+  @keyframes blobPulse {
+    0% { opacity: 0.15; transform: scale(1); }
+    100% { opacity: 0.3; transform: scale(1.1); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 700px;
+    padding: 0 30px;
+  }
+
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    animation: fadeDown 0.8s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo-icon {
+    font-size: 56px;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px var(--cyan));
+    animation: iconBounce 2s ease-in-out infinite;
+  }
+  @keyframes iconBounce {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+  }
+
+  .server-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--pink), var(--cyan), var(--yellow), var(--pink));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbowShift 3s linear infinite;
+  }
+  @keyframes rainbowShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  .tagline {
+    font-size: 12px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    font-weight: 700;
+  }
+
+  /* Info cards row */
+  .info-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .info-card {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s;
+  }
+  .info-card:hover { border-color: rgba(0,238,255,0.3); }
+
+  .info-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    font-weight: 700;
+  }
+
+  .info-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .info-icon {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .players-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .players-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    border-radius: 99px;
+    transition: width 1s ease;
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* Status card */
+  .status-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px 28px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .status-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-value {
+    font-size: 13px;
+    color: var(--cyan);
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .progress-wrap {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    width: 0%;
+    transition: width 0.4s ease;
+    position: relative;
+    box-shadow: 0 0 12px var(--cyan);
+  }
+
+  .progress-bar::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px; height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--cyan), 0 0 16px var(--cyan);
+  }
+
+  .loading-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 12px;
+  }
+
+  .dots span {
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--pink);
+    animation: dotBounce 1.2s ease-in-out infinite;
+    margin: 0 2px;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; background: var(--cyan); }
+  .dots span:nth-child(3) { animation-delay: 0.4s; background: var(--yellow); }
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1.2); opacity: 1; }
+  }
+
+  /* Particles */
+  .particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+  .particle {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-20px) scale(1); }
+  }
+
+  .tip {
+    position: fixed;
+    bottom: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    z-index: 10;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .tip span { color: var(--pink); font-weight: 700; }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .highlight-pink { color: var(--pink); }
+  .highlight-cyan { color: var(--cyan); }
+  .highlight-yellow { color: var(--yellow); }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+<div class="scanlines"></div>
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="logo-wrap">
+    <div class="logo-icon">🐍</div>
+    <div class="server-name">PythonGroup</div>
+    <div class="tagline">Garry's Mod Server</div>
+  </div>
+
+  <!-- Info cards -->
+  <div class="info-row">
+    <div class="info-card">
+      <div class="info-icon">🗺️</div>
+      <div class="info-label">Mapa actual</div>
+      <div class="info-value highlight-cyan" id="mapName">gm_construct</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">👥</div>
+      <div class="info-label">Jugadores</div>
+      <div class="info-value" id="playerCount"><span class="highlight-pink" id="curPlayers">0</span><span style="color:rgba(255,255,255,0.3);font-size:14px"> / </span><span class="highlight-yellow" id="maxPlayers">16</span></div>
+      <div class="players-bar"><div class="players-fill" id="playersFill" style="width:0%"></div></div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">📡</div>
+      <div class="info-label">Ping</div>
+      <div class="info-value highlight-yellow" id="pingValue">-- <span style="font-size:13px;color:rgba(255,255,255,0.3)">ms</span></div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="status-card">
+    <div class="status-row">
+      <span class="status-text">Estado</span>
+      <span class="status-value" id="statusText">Conectando...</span>
+    </div>
+    <div class="status-row" style="margin-bottom:0;">
+      <span class="status-text">Progreso</span>
+      <span class="status-value" id="progressText">0%</span>
+    </div>
+    <div class="progress-wrap" style="margin-top:14px;">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="loading-label">
+      Cargando
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="tip">Bienvenido a <span>PythonGroup</span> — que la suerte esté de tu lado ✨</div>
+
+<script>
+  // Particles
+  const pContainer = document.getElementById('particles');
+  const colors = ['#ff4fa3','#00eeff','#ffe94f','#b44fff'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
+    p.style.animationDuration = (Math.random() * 8 + 6) + 's';
+    p.style.animationDelay = (Math.random() * 8) + 's';
+    pContainer.appendChild(p);
+  }
+
+  // Read URL params (sent by the server via Lua)
+  const params = new URLSearchParams(window.location.search);
+  const map = params.get('map') || 'gm_construct';
+  const players = parseInt(params.get('players') || '0');
+  const maxplayers = parseInt(params.get('maxplayers') || '16');
+
+  document.getElementById('mapName').textContent = map;
+  document.getElementById('curPlayers').textContent = players;
+  document.getElementById('maxPlayers').textContent = maxplayers;
+  document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
+
+  // Ping measurement (real RTT via fetch timing)
+  async function measurePing() {
+    try {
+      const t0 = performance.now();
+      await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+      const ping = Math.round(performance.now() - t0);
+      document.getElementById('pingValue').innerHTML =
+        '<span style="color:' + (ping < 80 ? '#ffe94f' : ping < 150 ? '#ff9f4f' : '#ff4f4f') + '">' +
+        ping + '</span> <span style="font-size:13px;color:rgba(255,255,255,0.3)">ms</span>';
+    } catch(e) {
+      document.getElementById('pingValue').innerHTML = '-- <span style="font-size:13px;color:rgba(255,255,255,0.3)">ms</span>';
+    }
+  }
+  measurePing();
+  setInterval(measurePing, 3000);
+
+  // Progress
+  const statuses = [
+    "Conectando al servidor...",
+    "Descargando recursos...",
+    "Cargando addons...",
+    "Inicializando Lua...",
+    "Casi listo...",
+    "¡Entrando al juego!"
+  ];
+
+  let progress = 0;
+  const bar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const statusText = document.getElementById('statusText');
+
+  function updateProgress() {
+    if (typeof gameui !== 'undefined' && gameui.GetProgressPercent) {
+      progress = gameui.GetProgressPercent();
+    } else {
+      progress = Math.min(progress + Math.random() * 2.5, 100);
+    }
+
+    bar.style.width = progress + '%';
+    progressText.textContent = Math.floor(progress) + '%';
+    statusText.textContent = statuses[Math.min(Math.floor(progress / 17), statuses.length - 1)];
+
+    if (progress < 100) requestAnimationFrame(updateProgress);
+  }
+  setTimeout(updateProgress, 500);
+</script>
+</body>
+</html>
