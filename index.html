@@ -21,7 +21,6 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  zoom: 1.4;
 }
 
 /* Grid bg */
@@ -406,6 +405,13 @@ body {
     document.getElementById('progressText').textContent = Math.floor(p)+'%';
     if (p>=100) clearInterval(sim);
   }, 120);
+</script>
+<script>
+  // Scale up content for GMod's Chromium
+  document.body.style.width = '71vw';
+  document.body.style.height = '71vh';
+  document.body.style.transform = 'scale(1.4)';
+  document.body.style.transformOrigin = 'top left';
 </script>
 </body>
 </html>
