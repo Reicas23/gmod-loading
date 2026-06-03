@@ -500,52 +500,51 @@
 <script>
   
 
-  // Fetch real server data from Steam Web API (cors proxy)
-  async function fetchServerInfo() {
-    try {
-      const ip = '159.112.138.246';
-      const port = '27015';
-      const apiUrl = `https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001/?addr=${ip}:${port}&format=json`;
-      
-      // Use allorigins as CORS proxy
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-      const res = await fetch(proxyUrl);
-      const data = await res.json();
-      const parsed = JSON.parse(data.contents);
-
-      if (parsed.response && parsed.response.servers && parsed.response.servers.length > 0) {
-        const srv = parsed.response.servers[0];
-        const map = srv.map || 'gm_construct';
-        const players = parseInt(srv.players) || 0;
-        const maxplayers = parseInt(srv.max_players) || 16;
-        const gamemode = srv.gametype || 'sandbox';
-
-        document.getElementById('mapName').textContent = map;
-        document.getElementById('gamemodeText').textContent = gamemode.charAt(0).toUpperCase() + gamemode.slice(1);
-        document.getElementById('curPlayers').textContent = players;
-        document.getElementById('maxPlayers').textContent = maxplayers;
-        document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
-        document.getElementById('playersSub').textContent = players === 0 ? 'Servidor vacío' : players + ' jugador' + (players > 1 ? 'es' : '') + ' en línea';
-        return;
-      }
-    } catch(e) {}
-
-    // Fallback: use URL params if API fails
-    const params = new URLSearchParams(window.location.search);
-    const map = params.get('map') || 'gm_construct';
-    const players = parseInt(params.get('players') || '0');
-    const maxplayers = parseInt(params.get('maxplayers') || '16');
-    const gamemode = params.get('gamemode') || 'sandbox';
-    document.getElementById('mapName').textContent = map;
-    document.getElementById('gamemodeText').textContent = gamemode.charAt(0).toUpperCase() + gamemode.slice(1);
-    document.getElementById('curPlayers').textContent = players;
-    document.getElementById('maxPlayers').textContent = maxplayers;
-    document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
-    document.getElementById('playersSub').textContent = players === 0 ? 'Servidor vacío' : players + ' jugador' + (players > 1 ? 'es' : '') + ' en línea';
+  // GMod calls this automatically with real server data
+  function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
+    document.getElementById('mapName').textContent = mapname || 'gm_construct';
+    document.getElementById('gamemodeText').textContent = gamemode ? gamemode.charAt(0).toUpperCase() + gamemode.slice(1) : 'Sandbox';
+    document.getElementById('maxPlayers').textContent = maxplayers || 16;
+    // Players count via SetFilesNeeded isn't available here, leave at 0
   }
 
-  fetchServerInfo();
-  setInterval(fetchServerInfo, 10000);
+  // GMod calls this when download status changes
+  function SetStatusChanged(status) {
+    document.getElementById('statusText').textContent = status || 'Cargando...';
+  }
+
+  // GMod calls this with total files to download
+  function SetFilesTotal(total) {
+    window._filesTotal = total || 1;
+  }
+
+  // GMod calls this with files remaining
+  function SetFilesNeeded(needed) {
+    const total = window._filesTotal || 1;
+    const done = total - needed;
+    const pct = Math.min(Math.floor((done / total) * 100), 99);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '%';
+  }
+
+  // GMod calls this when downloading a file
+  function DownloadingFile(fileName) {
+    const short = fileName.split('/').pop();
+    document.getElementById('statusText').textContent = 'Descargando: ' + short;
+  }
+
+  // Simulate progress for preview (won't run in GMod since GameDetails fires first)
+  if (typeof GameDetails === 'undefined' || window.location.protocol === 'file:') {
+    let p = 0;
+    const statuses = ['Conectando...','Descargando recursos...','Cargando addons...','Iniciando Lua...','¡Entrando al juego!'];
+    const sim = setInterval(() => {
+      p = Math.min(p + Math.random() * 3, 100);
+      document.getElementById('progressBar').style.width = p + '%';
+      document.getElementById('progressText').textContent = Math.floor(p) + '%';
+      document.getElementById('statusText').textContent = statuses[Math.min(Math.floor(p/21), statuses.length-1)];
+      if (p >= 100) clearInterval(sim);
+    }, 100);
+  }
 
   // Ping
   async function measurePing() {
