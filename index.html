@@ -357,15 +357,39 @@ body {
     updatePlayerCircles(1, max);
 
     // Steam avatar
-    if (steamid && steamid !== '0') {
-      fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://steamcommunity.com/profiles/' + steamid + '/?xml=1'))
-        .then(r => r.json()).then(d => {
-          const m = d.contents && d.contents.match(/avatarFull[^>]*>.*?CDATA\[([^\]]+)\]/);
-          if (m) document.getElementById('playerAvatar').innerHTML = '<img src="'+m[1]+'">';
-          const nm = d.contents && d.contents.match(/steamID[^>]*>.*?CDATA\[([^\]]+)\]/);
-          if (nm) document.getElementById('playerName').textContent = nm[1];
-        }).catch(()=>{});
+if (steamid && steamid !== '0') {
+  fetch(
+    'https://api.allorigins.win/get?url=' +
+    encodeURIComponent(
+      'https://steamcommunity.com/profiles/' + steamid + '/?xml=1'
+    )
+  )
+  .then(r => r.json())
+  .then(d => {
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(d.contents, "text/xml");
+
+    const name =
+      xml.querySelector("steamID")?.textContent || "";
+
+    const avatar =
+      xml.querySelector("avatarFull")?.textContent || "";
+
+    console.log("Nombre:", name);
+    console.log("Avatar:", avatar);
+
+    if (name) {
+      document.getElementById("playerName").textContent = name;
     }
+
+    if (avatar) {
+      document.getElementById("playerAvatar").innerHTML =
+        `<img src="${avatar}">`;
+    }
+  })
+  .catch(err => console.error(err));
+}
   }
 
   function SetStatusChanged(status) {
