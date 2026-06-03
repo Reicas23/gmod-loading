@@ -500,19 +500,52 @@
 <script>
   
 
-  // URL params
-  const params = new URLSearchParams(window.location.search);
-  const map = params.get('map') || 'gm_construct';
-  const players = parseInt(params.get('players') || '0');
-  const maxplayers = parseInt(params.get('maxplayers') || '16');
-  const gamemode = params.get('gamemode') || 'Sandbox';
+  // Fetch real server data from Steam Web API (cors proxy)
+  async function fetchServerInfo() {
+    try {
+      const ip = '159.112.138.246';
+      const port = '27015';
+      const apiUrl = `https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001/?addr=${ip}:${port}&format=json`;
+      
+      // Use allorigins as CORS proxy
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+      const res = await fetch(proxyUrl);
+      const data = await res.json();
+      const parsed = JSON.parse(data.contents);
 
-  document.getElementById('mapName').textContent = map;
-  document.getElementById('gamemodeText').textContent = gamemode.charAt(0).toUpperCase() + gamemode.slice(1);
-  document.getElementById('curPlayers').textContent = players;
-  document.getElementById('maxPlayers').textContent = maxplayers;
-  document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
-  document.getElementById('playersSub').textContent = players === 0 ? 'Servidor vacío' : players + ' jugador' + (players > 1 ? 'es' : '') + ' en línea';
+      if (parsed.response && parsed.response.servers && parsed.response.servers.length > 0) {
+        const srv = parsed.response.servers[0];
+        const map = srv.map || 'gm_construct';
+        const players = parseInt(srv.players) || 0;
+        const maxplayers = parseInt(srv.max_players) || 16;
+        const gamemode = srv.gametype || 'sandbox';
+
+        document.getElementById('mapName').textContent = map;
+        document.getElementById('gamemodeText').textContent = gamemode.charAt(0).toUpperCase() + gamemode.slice(1);
+        document.getElementById('curPlayers').textContent = players;
+        document.getElementById('maxPlayers').textContent = maxplayers;
+        document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
+        document.getElementById('playersSub').textContent = players === 0 ? 'Servidor vacío' : players + ' jugador' + (players > 1 ? 'es' : '') + ' en línea';
+        return;
+      }
+    } catch(e) {}
+
+    // Fallback: use URL params if API fails
+    const params = new URLSearchParams(window.location.search);
+    const map = params.get('map') || 'gm_construct';
+    const players = parseInt(params.get('players') || '0');
+    const maxplayers = parseInt(params.get('maxplayers') || '16');
+    const gamemode = params.get('gamemode') || 'sandbox';
+    document.getElementById('mapName').textContent = map;
+    document.getElementById('gamemodeText').textContent = gamemode.charAt(0).toUpperCase() + gamemode.slice(1);
+    document.getElementById('curPlayers').textContent = players;
+    document.getElementById('maxPlayers').textContent = maxplayers;
+    document.getElementById('playersFill').style.width = (players / maxplayers * 100) + '%';
+    document.getElementById('playersSub').textContent = players === 0 ? 'Servidor vacío' : players + ' jugador' + (players > 1 ? 'es' : '') + ' en línea';
+  }
+
+  fetchServerInfo();
+  setInterval(fetchServerInfo, 10000);
 
   // Ping
   async function measurePing() {
